@@ -14,5 +14,5 @@ You can run TensorFlow on Windows via Anaconda ([instructions](https://www.tenso
 or Docker
 ([instructions](https://www.tensorflow.org/versions/r0.11/get_started/os_setup.html#docker-installation)). 
 For installation instructions on Windows 10 see [here](http://www.hanselman.com/blog/PlayingWithTensorFlowOnWindows.aspx) taking into account that the at the time of writing of this README the current version is 0.11, so replace 0.8 with 0.11.
-Disclaimer: I have not tried to run TensorFlow on Windows.
+Disclaimer: I have not tried to install nor run TensorFlow on Windows.
 
