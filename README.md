@@ -8,7 +8,7 @@ Prerequisites:
 * Python
 * [Tensorflow](https://www.tensorflow.org)
 
-If you use Linux or OSX the installation should be pretty smooth via [pip](https://www.tensorflow.org/versions/r0.11/get_started/os_setup.html#pip-installation).
+If you use Linux or OSX the installation should be pretty smooth via pip ([instructions](https://www.tensorflow.org/versions/r0.11/get_started/os_setup.html#pip-installation)).
 
 You can run TensorFlow on Windows via Anaconda ([instructions](https://www.tensorflow.org/versions/r0.11/get_started/os_setup.html#anaconda-installation))
 or Docker
