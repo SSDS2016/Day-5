@@ -1,8 +1,8 @@
 A simple TensorFlow code that demonstrates learning three simple models:
 
-1. logistic regression
-2. 2-layer fully connected net, and 
-3. convolutional net with two convolutional, one fully connected and an output layer
+1. logistic regression,
+2. net with one fully-connected hidden layer,
+3. convolutional net with two hidden convolutional, one hidden fully-connected layer.
 
 Prerequisites:
 * Python
