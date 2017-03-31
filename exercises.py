@@ -8,15 +8,15 @@ def main(parms):
 
   n_data = parms['n_data']                                      # the number of data points
   n_data_feat = parms['n_data_feat']                            # the dimensionality of the feature vector
-  n_labels = parms['n_labels']                                  # the number of labels 
+  n_labels = parms['n_labels']                                  # the number of labels
   assert(mnist.train.images.shape[0] == n_data)
   assert(mnist.train.images.shape[1] == n_data_feat)
   assert(mnist.train.labels.shape[0] == n_data)
   assert(mnist.train.labels.shape[1] == n_labels)
 
   # define the input and target placeholders
-  data_p = tf.placeholder(tf.float32, shape = [None, n_data_feat])  # placeholder for the data that will be fed in batches, 
-                                                                    # therefore the first dimension is None, since the 
+  data_p = tf.placeholder(tf.float32, shape = [None, n_data_feat])  # placeholder for the data that will be fed in batches,
+                                                                    # therefore the first dimension is None, since the
                                                                     # size of the batch can vary
   target_p = tf.placeholder(tf.float32, shape = [None, n_labels])   # placeholder for the labels that will be fed in batches
 
@@ -26,33 +26,33 @@ def main(parms):
     # -- model #1 --
     # define the model parameters
     W = tf.Variable(tf.truncated_normal([n_data_feat, n_labels], stddev = parms['init_variance'])) # for multiclass logisitc regression we have only
-                                                                                                   # one fully-connected layer 
+                                                                                                   # one fully-connected layer
                                                                                                    # (initialized with truncated normal distribution);
                                                                                                    # it maps features to labels, therefore the dimensions
                                                                                                    # of the weight matrix are [n_data_feat, n_labels]
     b = tf.Variable(tf.zeros([n_labels]))                                                          # we have one bias per class
     # define the model architecture
-    logits = tf.matmul(data_p, W) + b                                                              # the definition of the mapping from data to logits 
-                                                                                                   # via model parameters (W,b); 
+    logits = tf.matmul(data_p, W) + b                                                              # the definition of the mapping from data to logits
+                                                                                                   # via model parameters (W,b);
   elif (parms['model_type'] == 'fc'):
     # -- model #2 --
-    fc1_W = tf.Variable(tf.truncated_normal([n_data_feat, 64], stddev = parms['init_variance'])) # as in logistic regression case, just 
+    fc1_W = tf.Variable(tf.truncated_normal([n_data_feat, 64], stddev = parms['init_variance'])) # as in logistic regression case, just
                                                                                                  # here the first layer maps into a hidden 64-dimensional layer
     fc1_b = tf.Variable(tf.zeros([64]))
-    fc2_W = tf.Variable(tf.truncated_normal([64, n_labels], stddev = parms['init_variance']))    # the last layer maps from the hidden layer into the number of 
-                                                                                                 # classes; this can be thought as logistic regression on the 
+    fc2_W = tf.Variable(tf.truncated_normal([64, n_labels], stddev = parms['init_variance']))    # the last layer maps from the hidden layer into the number of
+                                                                                                 # classes; this can be thought as logistic regression on the
                                                                                                  # features from the hidden layers
     fc2_b = tf.Variable(tf.zeros([n_labels]))
     # model arch
-    h_fc1 = tf.nn.relu(tf.matmul(data_p, fc1_W) + fc1_b)            # hidden layers features are non-linear map of input featues, 
+    h_fc1 = tf.nn.relu(tf.matmul(data_p, fc1_W) + fc1_b)            # hidden layers features are non-linear map of input featues,
                                                                     # here we use ReLU(x)=max(0,x) as non-linearity
     logits = tf.matmul(h_fc1, fc2_W) + fc2_b                        # same as for logistic regression, just here inputs are features from hidden layer
   elif (parms['model_type'] == 'conv'):
     # -- model #3 --
-    conv1_w = tf.Variable(tf.truncated_normal([5, 5, 1, 32], stddev = parms['init_variance']))  # in convolutional network the paramters are filter kernels, 
+    conv1_w = tf.Variable(tf.truncated_normal([5, 5, 1, 32], stddev = parms['init_variance']))  # in convolutional network the paramters are filter kernels,
                                                                                                 # here we map an input image (in MNIST that is 28x28x1 image,
                                                                                                 # last channel is x1 since it's grayscale image) into 32 feature
-                                                                                                # maps at the output. The kernel size is 5x5, the number of 
+                                                                                                # maps at the output. The kernel size is 5x5, the number of
                                                                                                 # input maps is 1, and the number of output maps is 32.
     conv1_b = tf.Variable(tf.zeros([32]))
     conv2_w = tf.Variable(tf.truncated_normal([5, 5, 32, 64], stddev = parms['init_variance'])) # second convolutional layer operates on 32 feature maps produced
@@ -68,46 +68,46 @@ def main(parms):
                                                                                                 # into the logits
     fc2_b = tf.Variable(tf.zeros([n_labels]))
     # model arch
-    image = tf.reshape(data_p, [-1, 28, 28, 1])                                                                 # since the images are stored as vectors we first 
+    image = tf.reshape(data_p, [-1, 28, 28, 1])                                                                 # since the images are stored as vectors we first
                                                                                                                 # reshape them into a tensor; first dimension of the
                                                                                                                 # tensor is the number of images in the batch,
                                                                                                                 # the second dimension is image height, the third
                                                                                                                 # the image widht and the last one is the number of
                                                                                                                 # input channels
-    h_conv1 = tf.nn.relu(tf.nn.conv2d(image, conv1_w, strides = [1, 1, 1, 1], padding = 'SAME') + conv1_b)      # we apply the convolution on the input and apply 
-                                                                                                                # ReLU non-linearity, padding 'SAME' denotes that the 
+    h_conv1 = tf.nn.relu(tf.nn.conv2d(image, conv1_w, strides = [1, 1, 1, 1], padding = 'SAME') + conv1_b)      # we apply the convolution on the input and apply
+                                                                                                                # ReLU non-linearity, padding 'SAME' denotes that the
                                                                                                                 # image will be padded with zeros so that the output
                                                                                                                 # has the same spatial dimensions as input (for MNIST
                                                                                                                 # that is 28x28)
-    h_pool1 = tf.nn.max_pool(h_conv1, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding = 'SAME')           # we after convolution we apply max-pooling with 
-                                                                                                                # kernel size 2x2 in spatial domain, no pooling over 
+    h_pool1 = tf.nn.max_pool(h_conv1, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding = 'SAME')           # we after convolution we apply max-pooling with
+                                                                                                                # kernel size 2x2 in spatial domain, no pooling over
                                                                                                                 # batches (first dimension) or channels (last dimension),
                                                                                                                 # with a stride 2 (non-overlapping max pooling)
     h_conv2 = tf.nn.relu(tf.nn.conv2d(h_pool1, conv2_w, strides = [1, 1, 1, 1], padding = 'SAME') + conv2_b)    # the second convolutional layer is functionally the same
                                                                                                                 # as the previous one
     h_pool2 = tf.nn.max_pool(h_conv2, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding = 'SAME')           # same for max pooling
     h_fc1 = tf.nn.relu(tf.matmul(tf.reshape(h_pool2, [-1, 7*7*64]), fc1_W) + fc1_b)                             # here we first reshape feature maps that are output
-                                                                                                                # of second convolutional layer into one vector per 
+                                                                                                                # of second convolutional layer into one vector per
                                                                                                                 # data point: since inputs are 28x28 and they pass through
                                                                                                                 # two 2x2 non-overlapping max-pooling layers the spatial
                                                                                                                 # size of feature maps is 28/(2*2)=7, so the feature maps
-                                                                                                                # for one image are of dimension 7x7x64; then we 
+                                                                                                                # for one image are of dimension 7x7x64; then we
                                                                                                                 # feed these reshaped features into a fully-connected
                                                                                                                 # layer
     logits = tf.matmul(h_fc1, fc2_W) + fc2_b                                                                    # finally we apply an output layer, as in previous examples,
                                                                                                                 # to obtain the logits
 
   # evaluate loss from net output and target
-  loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits, target_p))                              # our loss is cross-entropy loss between the net predictions
+  loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=target_p))                # our loss is cross-entropy loss between the net predictions
                                                                                                                 # and the true labels (target_p); for numberical stability
                                                                                                                 # instead of supplying the posteriors (passing the logits
-                                                                                                                # through the softmax) we supply the logits into the function 
+                                                                                                                # through the softmax) we supply the logits into the function
                                                                                                                 # tf.nn.softmax_cross_entropy
   # prediction is softmax of logits
-  prediction = tf.nn.softmax(logits)                                                                            
+  prediction = tf.nn.softmax(logits)
   # define the evaluation measure
   correct_prediction = tf.equal(tf.argmax(target_p, 1), tf.argmax(prediction, 1))                               # we evaluate the prediction accuracy of the network by first
-                                                                                                                # determining for each data point the class with maximum 
+                                                                                                                # determining for each data point the class with maximum
                                                                                                                 # posterior, and comparing that class with the ground-truth:
                                                                                                                 # if the predicted class is the same as ground truth prediction
                                                                                                                 # for that data point is correct (1), otherwise not correct (0)
@@ -122,21 +122,21 @@ def main(parms):
                                                                                                                 # much from the gradients computed in the previous steps, i.e.
                                                                                                                 # the parameters are intert
   elif (parms['optimizer_type'] == 'ADAM'):
-    optimizer = tf.train.AdamOptimizer(parms['lambda'])                                                         # ADAM is currently the most advanced optimizer, gives 
+    optimizer = tf.train.AdamOptimizer(parms['lambda'])                                                         # ADAM is currently the most advanced optimizer, gives
                                                                                                                 # decent results for majority of the networks and converges
                                                                                                                 # much faster than the previous two
   # TODO: try decaying learning rate (see TF API: tf.train.exponential_decay)
-  optimization_step = optimizer.minimize(loss)                                                                  # the optimization step is performed by minimizing the loss 
+  optimization_step = optimizer.minimize(loss)                                                                  # the optimization step is performed by minimizing the loss
                                                                                                                 # function; behind the scenes function minimize actually calls
-                                                                                                                # two functions: first it calls compute_gradients, that computes 
-                                                                                                                # all needed gradients using backprop, second it calls 
+                                                                                                                # two functions: first it calls compute_gradients, that computes
+                                                                                                                # all needed gradients using backprop, second it calls
                                                                                                                 # apply_gradients that applies gradients according to the
                                                                                                                 # chosen optimizer
 
   saver = tf.train.Saver()                                                                                      # an object used for saving the parameters of the network
                                                                                                                 # into a checkpoint file
 
-  sess = tf.Session()                                                                                           # TensorFlow session object, which contais the graph and 
+  sess = tf.Session()                                                                                           # TensorFlow session object, which contais the graph and
                                                                                                                 # within which all the operations will be evaluated
 
   sess.run(tf.initialize_all_variables())                                                                       # initialize all graph variables (weights, biases)
